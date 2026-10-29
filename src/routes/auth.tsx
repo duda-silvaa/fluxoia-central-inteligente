@@ -32,7 +32,7 @@ const signupSchema = loginSchema.extend({
   organization: z.string().trim().min(2, "Informe o nome da equipe").max(100),
 });
 
-function FieldError({ msg }: { msg?: string }) {
+function FieldError({ msg }: { msg?: string | undefined }) {
   return msg ? <p className="text-xs text-destructive">{msg}</p> : null;
 }
 
@@ -91,7 +91,7 @@ function LoginForm() {
   const f = useForm<z.infer<typeof loginSchema>>({ resolver: zodResolver(loginSchema) });
   const onSubmit = f.handleSubmit(async (v) => {
     const { error } = await supabase.auth.signInWithPassword({ email: v.email, password: v.password });
-    if (error) return toast.error(error.message === "Invalid login credentials" ? "E-mail ou senha incorretos." : error.message);
+    if (error) { toast.error(error.message === "Invalid login credentials" ? "E-mail ou senha incorretos." : error.message); return; }
     navigate({ to: "/dashboard", replace: true });
   });
   return (
@@ -124,7 +124,7 @@ function SignupForm({ onDone }: { onDone: () => void }) {
         data: { full_name: v.fullName, organization_name: v.organization },
       },
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     if (!data.session) {
       toast.success("Conta criada! Confirme seu e-mail pelo link enviado e depois entre.");
       onDone();
@@ -163,7 +163,7 @@ function ForgotForm() {
   const f = useForm<{ email: string }>({ resolver: zodResolver(z.object({ email: z.string().trim().email("Informe um e-mail válido") })) });
   const onSubmit = f.handleSubmit(async (v) => {
     const { error } = await supabase.auth.resetPasswordForEmail(v.email, { redirectTo: `${window.location.origin}/reset-password` });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Se o e-mail estiver cadastrado, você receberá um link de recuperação.");
   });
   return (

@@ -38,7 +38,7 @@ function NotificationsPage() {
   });
   async function markAll() {
     const { error } = await supabase.from("notifications").update({ read_at: new Date().toISOString() }).is("read_at", null);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["notifications"] });
   }
   async function mark(id: string) {

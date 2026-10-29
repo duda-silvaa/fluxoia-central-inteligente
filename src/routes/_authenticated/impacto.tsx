@@ -64,7 +64,7 @@ function ImpactPage() {
 
   const onSubmit = f.handleSubmit(async (v) => {
     const { error } = await supabase.from("time_measurements").insert({ ...v, notes: v.notes || null });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Amostra registrada.");
     f.reset({ method: v.method, observations: 1, task: "", notes: "" });
     qc.invalidateQueries({ queryKey: ["measurements"] });
@@ -72,18 +72,18 @@ function ImpactPage() {
 
   async function del(id: string) {
     const { error } = await supabase.from("time_measurements").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["measurements"] });
   }
   async function resetDemo() {
     const { error } = await supabase.rpc("reset_demo_data");
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Dados de demonstração removidos.");
     qc.invalidateQueries();
   }
   async function seedDemo() {
     const { error } = await supabase.rpc("seed_demo_data");
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Dados de demonstração carregados.");
     qc.invalidateQueries();
   }

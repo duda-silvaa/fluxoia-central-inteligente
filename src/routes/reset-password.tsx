@@ -34,7 +34,7 @@ function ResetPassword() {
     e.preventDefault();
     if (pw.length < 6) return setErr("Mínimo de 6 caracteres");
     const { error } = await supabase.auth.updateUser({ password: pw });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Senha atualizada.");
     navigate({ to: "/dashboard" });
   }

@@ -38,10 +38,10 @@ function ProfilePage() {
 
   async function save(e: FormEvent) {
     e.preventDefault();
-    if (name.trim().length < 2 || org.trim().length < 2) return toast.error("Nome e organização precisam de ao menos 2 caracteres.");
+    if (name.trim().length < 2 || org.trim().length < 2) { toast.error("Nome e organização precisam de ao menos 2 caracteres."); return; }
     const a = await supabase.from("profiles").update({ full_name: name.trim(), job_title: job.trim() || null }).eq("id", data!.id);
     const b = await supabase.from("organizations").update({ name: org.trim() }).eq("id", data!.organization_id);
-    if (a.error || b.error) return toast.error((a.error ?? b.error)!.message);
+    if (a.error || b.error) { toast.error((a.error ?? b.error)!.message); return; }
     toast.success("Perfil atualizado.");
     qc.invalidateQueries({ queryKey: ["profile"] });
   }

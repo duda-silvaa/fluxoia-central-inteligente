@@ -82,7 +82,7 @@ function Dashboard() {
     setSeeding(true);
     const { error } = await supabase.rpc("seed_demo_data");
     setSeeding(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Dados de demonstração carregados.");
     qc.invalidateQueries();
   }

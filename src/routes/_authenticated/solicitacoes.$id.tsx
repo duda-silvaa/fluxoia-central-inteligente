@@ -119,13 +119,13 @@ function RequestDetail() {
   }
   async function changeStatus(status: string) {
     const { error } = await supabase.from("requests").update({ status: status as never }).eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Status atualizado.");
     qc.invalidateQueries();
   }
   async function remove() {
     const { error } = await supabase.from("requests").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Solicitação excluída.");
     qc.invalidateQueries();
     navigate({ to: "/solicitacoes" });
