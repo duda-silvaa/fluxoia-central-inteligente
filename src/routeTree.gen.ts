@@ -10,6 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedSolicitacoesIndexRouteImport } from './routes/_authenticated/solicitacoes.index'
 import { Route as ApiPublicN8nAnalyzeRouteImport } from './routes/api/public/n8n/analyze'
 import { Route as ApiPublicN8nCallbackRouteImport } from './routes/api/public/n8n/callback'
 
@@ -18,6 +23,31 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSolicitacoesIndexRoute =
+  AuthenticatedSolicitacoesIndexRouteImport.update({
+    id: '/solicitacoes/',
+    path: '/solicitacoes/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicN8nAnalyzeRoute = ApiPublicN8nAnalyzeRouteImport.update({
   id: '/api/public/n8n/analyze',
   path: '/api/public/n8n/analyze',
@@ -31,30 +61,69 @@ const ApiPublicN8nCallbackRoute = ApiPublicN8nCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/solicitacoes/': typeof AuthenticatedSolicitacoesIndexRoute
   '/api/public/n8n/analyze': typeof ApiPublicN8nAnalyzeRoute
   '/api/public/n8n/callback': typeof ApiPublicN8nCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/solicitacoes': typeof AuthenticatedSolicitacoesIndexRoute
   '/api/public/n8n/analyze': typeof ApiPublicN8nAnalyzeRoute
   '/api/public/n8n/callback': typeof ApiPublicN8nCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/solicitacoes/': typeof AuthenticatedSolicitacoesIndexRoute
   '/api/public/n8n/analyze': typeof ApiPublicN8nAnalyzeRoute
   '/api/public/n8n/callback': typeof ApiPublicN8nCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/n8n/analyze' | '/api/public/n8n/callback'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/solicitacoes/'
+    | '/api/public/n8n/analyze'
+    | '/api/public/n8n/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/n8n/analyze' | '/api/public/n8n/callback'
-  id: '__root__' | '/' | '/api/public/n8n/analyze' | '/api/public/n8n/callback'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/solicitacoes'
+    | '/api/public/n8n/analyze'
+    | '/api/public/n8n/callback'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/solicitacoes/'
+    | '/api/public/n8n/analyze'
+    | '/api/public/n8n/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicN8nAnalyzeRoute: typeof ApiPublicN8nAnalyzeRoute
   ApiPublicN8nCallbackRoute: typeof ApiPublicN8nCallbackRoute
 }
@@ -67,6 +136,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/solicitacoes/': {
+      id: '/_authenticated/solicitacoes/'
+      path: '/solicitacoes'
+      fullPath: '/solicitacoes/'
+      preLoaderRoute: typeof AuthenticatedSolicitacoesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/n8n/analyze': {
       id: '/api/public/n8n/analyze'
@@ -85,8 +189,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSolicitacoesIndexRoute: typeof AuthenticatedSolicitacoesIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSolicitacoesIndexRoute: AuthenticatedSolicitacoesIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicN8nAnalyzeRoute: ApiPublicN8nAnalyzeRoute,
   ApiPublicN8nCallbackRoute: ApiPublicN8nCallbackRoute,
 }
