@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicN8nAnalyzeRouteImport } from './routes/api/public/n8n/analyze'
+import { Route as ApiPublicN8nCallbackRouteImport } from './routes/api/public/n8n/callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicN8nAnalyzeRoute = ApiPublicN8nAnalyzeRouteImport.update({
+  id: '/api/public/n8n/analyze',
+  path: '/api/public/n8n/analyze',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicN8nCallbackRoute = ApiPublicN8nCallbackRouteImport.update({
+  id: '/api/public/n8n/callback',
+  path: '/api/public/n8n/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/n8n/analyze': typeof ApiPublicN8nAnalyzeRoute
+  '/api/public/n8n/callback': typeof ApiPublicN8nCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/n8n/analyze': typeof ApiPublicN8nAnalyzeRoute
+  '/api/public/n8n/callback': typeof ApiPublicN8nCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/n8n/analyze': typeof ApiPublicN8nAnalyzeRoute
+  '/api/public/n8n/callback': typeof ApiPublicN8nCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/public/n8n/analyze' | '/api/public/n8n/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/public/n8n/analyze' | '/api/public/n8n/callback'
+  id: '__root__' | '/' | '/api/public/n8n/analyze' | '/api/public/n8n/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicN8nAnalyzeRoute: typeof ApiPublicN8nAnalyzeRoute
+  ApiPublicN8nCallbackRoute: typeof ApiPublicN8nCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/n8n/analyze': {
+      id: '/api/public/n8n/analyze'
+      path: '/api/public/n8n/analyze'
+      fullPath: '/api/public/n8n/analyze'
+      preLoaderRoute: typeof ApiPublicN8nAnalyzeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/n8n/callback': {
+      id: '/api/public/n8n/callback'
+      path: '/api/public/n8n/callback'
+      fullPath: '/api/public/n8n/callback'
+      preLoaderRoute: typeof ApiPublicN8nCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicN8nAnalyzeRoute: ApiPublicN8nAnalyzeRoute,
+  ApiPublicN8nCallbackRoute: ApiPublicN8nCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
