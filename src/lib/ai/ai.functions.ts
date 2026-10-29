@@ -72,7 +72,7 @@ export const runEvalBatchFn = createServerFn({ method: "POST" })
       const c = EVAL_CASES.find((x) => x.id === id);
       if (!c) continue;
       const t0 = Date.now();
-      let row;
+      let row: { predicted_category: string | null; predicted_priority: string | null; requires_review: boolean | null; valid_output: boolean; error: string | null };
       try {
         const { result } = await runAgents(c.title, c.description);
         row = { predicted_category: result.category, predicted_priority: result.priority, requires_review: result.requires_human_review, valid_output: true, error: null };

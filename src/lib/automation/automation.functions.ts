@@ -57,7 +57,7 @@ export const reviewRequestFn = createServerFn({ method: "POST" })
       reviews.push({ field: "categoria", original_value: req.ai_category, corrected_value: data.category });
     if (data.priority !== req.ai_priority)
       reviews.push({ field: "prioridade", original_value: req.ai_priority, corrected_value: data.priority });
-    const rows =
+    const rows: { action: string; request_id: string; reviewer_id: string; reviewer_label: string; field: string | null; original_value: string | null; corrected_value: string | null; review_minutes: number | null }[] =
       reviews.length > 0
         ? reviews.map((r) => ({ ...r, action: "corrigida", request_id: req.id, reviewer_id: context.userId, reviewer_label: label, review_minutes: data.reviewMinutes ?? null }))
         : [{ action: "aprovada", request_id: req.id, reviewer_id: context.userId, reviewer_label: label, field: null, original_value: null, corrected_value: null, review_minutes: data.reviewMinutes ?? null }];

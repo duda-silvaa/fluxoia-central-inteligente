@@ -74,7 +74,10 @@ export async function chatJson(
         ],
       }),
     });
-    if (runId && !runId.value) runId.value = res.headers.get("X-Lovable-AIG-Run-ID") ?? undefined;
+    if (runId && !runId.value) {
+      const rid = res.headers.get("X-Lovable-AIG-Run-ID");
+      if (rid) runId.value = rid;
+    }
     if (!res.ok || !res.body) {
       const body = await res.text().catch(() => "");
       let msg = body;

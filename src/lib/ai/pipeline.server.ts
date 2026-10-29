@@ -41,7 +41,7 @@ async function runStep<T extends z.ZodTypeAny>(
   schema: T,
   runId: { value?: string },
 ): Promise<z.infer<T>> {
-  let lastErr: unknown;
+  let lastErr: unknown = new Error("Falha desconhecida");
   // one retry for transient provider failures or schema-invalid output
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
@@ -76,15 +76,15 @@ export async function runAgents(
   ];
   const exec = async <T>(i: number, fn: () => Promise<T>): Promise<T> => {
     const t0 = Date.now();
-    steps[i] = { ...steps[i], status: "running", started_at: new Date().toISOString() };
+    steps[i] = { ...steps[i]!, status: "running", started_at: new Date().toISOString() };
     await onStep?.(steps);
     try {
       const out = await fn();
-      steps[i] = { ...steps[i], status: "completed", output: out, finished_at: new Date().toISOString(), duration_ms: Date.now() - t0 };
+      steps[i] = { ...steps[i]!, status: "completed", output: out, finished_at: new Date().toISOString(), duration_ms: Date.now() - t0 };
       await onStep?.(steps);
       return out;
     } catch (e) {
-      steps[i] = { ...steps[i], status: "failed", error: e instanceof Error ? e.message : String(e), finished_at: new Date().toISOString(), duration_ms: Date.now() - t0 };
+      steps[i] = { ...steps[i]!, status: "failed", error: e instanceof Error ? e.message : String(e), finished_at: new Date().toISOString(), duration_ms: Date.now() - t0 };
       await onStep?.(steps);
       throw Object.assign(e instanceof Error ? e : new Error(String(e)), { steps });
     }

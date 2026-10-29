@@ -48,7 +48,7 @@ export type TriageResult = z.infer<typeof triageResultSchema>;
 /** Extracts the first JSON object from a model reply (handles ```json fences). */
 export function extractJson(text: string): unknown {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const raw = (fenced ? fenced[1] : text).trim();
+  const raw = (fenced?.[1] ?? text).trim();
   const start = raw.indexOf("{");
   const end = raw.lastIndexOf("}");
   if (start === -1 || end <= start) throw new Error("Resposta do modelo não contém JSON");

@@ -154,7 +154,8 @@ export function perDay(rows: Pick<RequestRow, "created_at">[], days = 14) {
     d.setDate(d.getDate() - i);
     const key = d.toISOString().slice(0, 10);
     out.push({ day: key.slice(5).split("-").reverse().join("/"), total: 0 });
-    for (const r of rows) if (r.created_at.slice(0, 10) === key) out[out.length - 1].total++;
+    const slot = out[out.length - 1]!;
+    for (const r of rows) if (r.created_at.slice(0, 10) === key) slot.total++;
   }
   return out;
 }
@@ -176,7 +177,7 @@ export function evalSummary(runs: Pick<EvalRunRow, "expected_category" | "predic
 
 export function toCsv(rows: Record<string, unknown>[]): string {
   if (rows.length === 0) return "";
-  const headers = Object.keys(rows[0]);
+  const headers = Object.keys(rows[0]!);
   const esc = (v: unknown) => {
     const s = v == null ? "" : typeof v === "object" ? JSON.stringify(v) : String(v);
     // neutralize spreadsheet formula injection

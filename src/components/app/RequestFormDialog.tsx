@@ -78,7 +78,10 @@ export function RequestFormDialog({
     };
     if (isEdit) {
       const { error } = await supabase.from("requests").update(payload).eq("id", request!.id);
-      if (error) return toast.error(error.message);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
       toast.success(
         request!.description !== v.description && request!.ai_status === "concluida"
           ? "Solicitação atualizada. A descrição mudou: considere reanalisar com IA."
@@ -89,7 +92,10 @@ export function RequestFormDialog({
       return;
     }
     const { data, error } = await supabase.from("requests").insert(payload).select("id").single();
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Solicitação registrada.");
     qc.invalidateQueries();
     onOpenChange(false);
@@ -179,7 +185,7 @@ function SelectField({
         control={control}
         name={name}
         render={({ field }) => (
-          <Select value={field.value ?? (allowNone ? NONE : undefined)} onValueChange={field.onChange}>
+          <Select value={field.value ?? (allowNone ? NONE : "")} onValueChange={field.onChange}>
             <SelectTrigger aria-label={label}><SelectValue /></SelectTrigger>
             <SelectContent>
               {allowNone && <SelectItem value={NONE}>Deixar para a IA sugerir</SelectItem>}

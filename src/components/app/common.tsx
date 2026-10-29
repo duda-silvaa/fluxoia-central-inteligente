@@ -76,7 +76,7 @@ const AI_TONE: Record<string, string> = {
   falhou: "bg-destructive/15 text-destructive",
 };
 export function AiBadge({ value }: { value: string }) {
-  return <Pill className={AI_TONE[value]}>{AI_STATUS_LABEL[value] ?? value}</Pill>;
+  return <Pill className={AI_TONE[value] ?? ""}>{AI_STATUS_LABEL[value] ?? value}</Pill>;
 }
 const AUTO_TONE: Record<string, string> = {
   nenhuma: "bg-muted text-muted-foreground",
@@ -86,7 +86,7 @@ const AUTO_TONE: Record<string, string> = {
   falhou: "bg-destructive/15 text-destructive",
 };
 export function AutomationBadge({ value }: { value: string }) {
-  return <Pill className={AUTO_TONE[value]}>{AUTOMATION_STATUS_LABEL[value] ?? value}</Pill>;
+  return <Pill className={AUTO_TONE[value] ?? ""}>{AUTOMATION_STATUS_LABEL[value] ?? value}</Pill>;
 }
 
 export function DemoTag() {
