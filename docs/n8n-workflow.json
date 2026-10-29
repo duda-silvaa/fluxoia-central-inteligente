@@ -1,0 +1,101 @@
+{
+  "name": "FluxoIA — Triagem de solicitações",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fluxoia-request-created",
+        "responseMode": "onReceived",
+        "options": { "rawBody": true }
+      },
+      "id": "a1",
+      "name": "Webhook FluxoIA",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "fluxoia-request-created"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Valida a assinatura HMAC enviada pelo FluxoIA\nconst crypto = require('crypto');\nconst secret = $env.FLUXOIA_WEBHOOK_SECRET;\nconst item = $input.first();\nconst h = item.json.headers;\nconst ts = h['x-fluxoia-timestamp'];\nconst sig = (h['x-fluxoia-signature'] || '').replace('sha256=', '');\nconst raw = JSON.stringify(item.json.body);\nconst expected = crypto.createHmac('sha256', secret).update(ts + '.' + raw).digest('hex');\nif (!ts || Math.abs(Date.now() - Number(ts)) > 5 * 60 * 1000) throw new Error('Evento expirado');\nif (expected !== sig) throw new Error('Assinatura inválida');\nconst body = item.json.body;\nconst payload = JSON.stringify({ execution_id: body.execution_id, request_id: body.request_id });\nconst now = String(Date.now());\nconst outSig = 'sha256=' + crypto.createHmac('sha256', secret).update(now + '.' + payload).digest('hex');\nreturn [{ json: { execution_id: body.execution_id, request_id: body.request_id, payload, ts: now, sig: outSig } }];"
+      },
+      "id": "a2",
+      "name": "Validar evento",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.FLUXOIA_BASE_URL}}/api/public/n8n/analyze",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-FluxoIA-Timestamp", "value": "={{$json.ts}}" },
+            { "name": "X-FluxoIA-Signature", "value": "={{$json.sig}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{$json.payload}}",
+        "options": { "timeout": 120000, "response": { "response": { "neverError": true, "fullResponse": true } } }
+      },
+      "id": "a3",
+      "name": "Executar análise de IA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "jsCode": "// Monta o callback assinado com o resultado\nconst crypto = require('crypto');\nconst secret = $env.FLUXOIA_WEBHOOK_SECRET;\nconst prev = $('Validar evento').first().json;\nconst res = $input.first().json;\nconst ok = res.statusCode === 200 && res.body && res.body.ok;\nconst payload = JSON.stringify({ execution_id: prev.execution_id, status: ok ? 'concluida' : 'falhou', error: ok ? undefined : String((res.body && res.body.error) || ('HTTP ' + res.statusCode)).slice(0, 900), notification_sent: false });\nconst ts = String(Date.now());\nconst sig = 'sha256=' + crypto.createHmac('sha256', secret).update(ts + '.' + payload).digest('hex');\nreturn [{ json: { payload, ts, sig, ok, result: ok ? res.body.result : null } }];"
+      },
+      "id": "a4",
+      "name": "Preparar callback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.FLUXOIA_BASE_URL}}/api/public/n8n/callback",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-FluxoIA-Timestamp", "value": "={{$json.ts}}" },
+            { "name": "X-FluxoIA-Signature", "value": "={{$json.sig}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{$json.payload}}",
+        "options": {}
+      },
+      "id": "a5",
+      "name": "Registrar resultado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    }
+  ],
+  "connections": {
+    "Webhook FluxoIA": { "main": [[{ "node": "Validar evento", "type": "main", "index": 0 }]] },
+    "Validar evento": { "main": [[{ "node": "Executar análise de IA", "type": "main", "index": 0 }]] },
+    "Executar análise de IA": { "main": [[{ "node": "Preparar callback", "type": "main", "index": 0 }]] },
+    "Preparar callback": { "main": [[{ "node": "Registrar resultado", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}
