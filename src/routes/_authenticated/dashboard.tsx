@@ -94,7 +94,7 @@ function Dashboard() {
   const im = view.impact;
   const totalAll = requests.data?.length ?? 0;
   const failedRuns = view.runRows.filter((r) => r.status === "falhou");
-  const needReview = view.rows.filter((r) => r.status === "Pendente de revisão").slice(0, 5);
+  const needReview = view.rows.filter((r) => r.status === "Pendente de revisão" || r.ai_requires_review === true).slice(0, 5);
 
   return (
     <div>
